@@ -557,99 +557,101 @@ bool DoDraw = true;			// Global-scope bool used to prevent drawing at inappropri
 
 
 // ---------------- PushLink() Link-moving function
-		void PushLink(int PushLinkDir){
-			if (PushLinkDir == DIR_UP && CanWalk(Link->X,Link->Y,DIR_UP,1,false)) Link->Y --;
-			if (PushLinkDir == DIR_DOWN && CanWalk(Link->X,Link->Y,DIR_DOWN,1,false)) Link->Y ++;
-			if (PushLinkDir == DIR_LEFT && CanWalk(Link->X,Link->Y,DIR_LEFT,1,false)) Link->X --;
-			if (PushLinkDir == DIR_RIGHT && CanWalk(Link->X,Link->Y,DIR_RIGHT,1,false)) Link->X ++;
-		}
-		// To-do: Incorporate PushLink() into Pegasus boots? (but those check if Link was going to collide with a solid to do the bonk and obstacle break, so it would need a rewrite)
+void PushLink(int PushLinkDir)
+{
+	if (PushLinkDir == DIR_UP && CanWalk(Link->X,Link->Y,DIR_UP,1,false)) Link->Y --;
+	if (PushLinkDir == DIR_DOWN && CanWalk(Link->X,Link->Y,DIR_DOWN,1,false)) Link->Y ++;
+	if (PushLinkDir == DIR_LEFT && CanWalk(Link->X,Link->Y,DIR_LEFT,1,false)) Link->X --;
+	if (PushLinkDir == DIR_RIGHT && CanWalk(Link->X,Link->Y,DIR_RIGHT,1,false)) Link->X ++;
+}
+	// To-do: Incorporate PushLink() into Pegasus boots? (but those check if Link was going to collide with a solid to do the bonk and obstacle break, so it would need a rewrite)
 
 
 // ---------------- Pegasus boot functions (start)
 
-		void PegasusShrapnel(){
-			Game->PlaySound(SFX_SHATTERING);
-			lweapon PegaShrapnel = CreateLWeaponAt(LW_SPARKLE,Link->X,Link->Y);
-			PegaShrapnel->UseSprite(SP_PEGASUSBREAK);
-			PegaShrapnel->Dir = DIR_LEFTUP;
-			PegaShrapnel->Step = 100;
-			PegaShrapnel = CreateLWeaponAt(LW_SPARKLE,Link->X,Link->Y);
-			PegaShrapnel->UseSprite(SP_PEGASUSBREAK);
-			PegaShrapnel->Flip = FLIP_HORIZONTAL;
-			PegaShrapnel->Dir = DIR_RIGHTUP;
-			PegaShrapnel->Step = 100;
-			PegaShrapnel = CreateLWeaponAt(LW_SPARKLE,Link->X,Link->Y);
-			PegaShrapnel->UseSprite(SP_PEGASUSBREAK);
-			PegaShrapnel->Flip = FLIP_VERTICAL;
-			PegaShrapnel->Dir = DIR_LEFTDOWN;
-			PegaShrapnel->Step = 100;
-			PegaShrapnel = CreateLWeaponAt(LW_SPARKLE,Link->X,Link->Y);
-			PegaShrapnel->UseSprite(SP_PEGASUSBREAK);
-			PegaShrapnel->Flip = FLIP_BOTH;
-			PegaShrapnel->Dir = DIR_RIGHTDOWN;
-			PegaShrapnel->Step = 100;
-		}
+void PegasusShrapnel()
+{
+	Game->PlaySound(SFX_SHATTERING);
+	lweapon PegaShrapnel = CreateLWeaponAt(LW_SPARKLE,Link->X,Link->Y);
+	PegaShrapnel->UseSprite(SP_PEGASUSBREAK);
+	PegaShrapnel->Dir = DIR_LEFTUP;
+	PegaShrapnel->Step = 100;
+	PegaShrapnel = CreateLWeaponAt(LW_SPARKLE,Link->X,Link->Y);
+	PegaShrapnel->UseSprite(SP_PEGASUSBREAK);
+	PegaShrapnel->Flip = FLIP_HORIZONTAL;
+	PegaShrapnel->Dir = DIR_RIGHTUP;
+	PegaShrapnel->Step = 100;
+	PegaShrapnel = CreateLWeaponAt(LW_SPARKLE,Link->X,Link->Y);
+	PegaShrapnel->UseSprite(SP_PEGASUSBREAK);
+	PegaShrapnel->Flip = FLIP_VERTICAL;
+	PegaShrapnel->Dir = DIR_LEFTDOWN;
+	PegaShrapnel->Step = 100;
+	PegaShrapnel = CreateLWeaponAt(LW_SPARKLE,Link->X,Link->Y);
+	PegaShrapnel->UseSprite(SP_PEGASUSBREAK);
+	PegaShrapnel->Flip = FLIP_BOTH;
+	PegaShrapnel->Dir = DIR_RIGHTDOWN;
+	PegaShrapnel->Step = 100;
+}
 
-		void PegasusBonk(){
-			if (Link->Dir == DIR_UP && Screen->ComboT[ComboAt(Link->X+7,Link->Y-1)] != CT_WATER || Link->Dir == DIR_DOWN && Screen->ComboT[ComboAt(Link->X+7,Link->Y+17)] != CT_WATER || Link->Dir == DIR_LEFT && Screen->ComboT[ComboAt(Link->X-1,Link->Y+8)] != CT_WATER || Link->Dir == DIR_RIGHT && Screen->ComboT[ComboAt(Link->X+17,Link->Y+8)] != CT_WATER){
-				Game->PlaySound(SFX_PEGABONK);
-				Link->Z = 1;
-				Link->Jump = 2;
-				if (Screen->Quake <= 0) Screen->Quake = 8;
-				if (!Screen->State[ST_SPECIALITEM])
+void PegasusBonk()
+{
+	if (Link->Dir == DIR_UP && Screen->ComboT[ComboAt(Link->X+7,Link->Y-1)] != CT_WATER || Link->Dir == DIR_DOWN && Screen->ComboT[ComboAt(Link->X+7,Link->Y+17)] != CT_WATER || Link->Dir == DIR_LEFT && Screen->ComboT[ComboAt(Link->X-1,Link->Y+8)] != CT_WATER || Link->Dir == DIR_RIGHT && Screen->ComboT[ComboAt(Link->X+17,Link->Y+8)] != CT_WATER){
+		Game->PlaySound(SFX_PEGABONK);
+		Link->Z = 1;
+		Link->Jump = 2;
+		if (Screen->Quake <= 0) Screen->Quake = 8;
+		if (!Screen->State[ST_SPECIALITEM])
+		{
+			if (Link->Dir == DIR_UP)
+			{
+				if (Screen->ComboF[ComboAt(Link->X+7,Link->Y-1)] == CF_PEGASUSITEM)
 				{
-					if (Link->Dir == DIR_UP)
-					{
-						if (Screen->ComboF[ComboAt(Link->X+7,Link->Y-1)] == CF_PEGASUSITEM)
-						{
-							Screen->ComboF[ComboAt(Link->X+7,Link->Y-1)] = CF_NONE;
-							item BootGet = CreateItemAt(Screen->RoomData,ComboX(ComboAt(Link->X+7,Link->Y-1)),ComboY(ComboAt(Link->X+7,Link->Y-1)-16));
-							BootGet->Pickup = IP_ST_SPECIALITEM + IP_HOLDUP;
-							BootGet->Jump = 1;
-							Game->PlaySound(SFX_PEGAITEM);
-						}
-					}
+					Screen->ComboF[ComboAt(Link->X+7,Link->Y-1)] = CF_NONE;
+					item BootGet = CreateItemAt(Screen->RoomData,ComboX(ComboAt(Link->X+7,Link->Y-1)),ComboY(ComboAt(Link->X+7,Link->Y-1)-16));
+					BootGet->Pickup = IP_ST_SPECIALITEM + IP_HOLDUP;
+					BootGet->Jump = 1;
+					Game->PlaySound(SFX_PEGAITEM);
+				}
+			}
 
-					if (Link->Dir == DIR_DOWN)
-					{
-						if (Screen->ComboF[ComboAt(Link->X+7,Link->Y+17)] == CF_PEGASUSITEM)
-						{
-							Screen->ComboF[ComboAt(Link->X+7,Link->Y+17)] = CF_NONE;
-							item BootGet = CreateItemAt(Screen->RoomData,ComboX(ComboAt(Link->X+7,Link->Y+17)),ComboY(ComboAt(Link->X+7,Link->Y+17)+16));
-							BootGet->Z = 16;
-							BootGet->Pickup = IP_ST_SPECIALITEM + IP_HOLDUP;
-							Game->PlaySound(SFX_PEGAITEM);
-						}
-					}
+			if (Link->Dir == DIR_DOWN)
+			{
+				if (Screen->ComboF[ComboAt(Link->X+7,Link->Y+17)] == CF_PEGASUSITEM)
+				{
+					Screen->ComboF[ComboAt(Link->X+7,Link->Y+17)] = CF_NONE;
+					item BootGet = CreateItemAt(Screen->RoomData,ComboX(ComboAt(Link->X+7,Link->Y+17)),ComboY(ComboAt(Link->X+7,Link->Y+17)+16));
+					BootGet->Z = 16;
+					BootGet->Pickup = IP_ST_SPECIALITEM + IP_HOLDUP;
+					Game->PlaySound(SFX_PEGAITEM);
+				}
+			}
 
-					if (Link->Dir == DIR_LEFT)
-					{
-						if (Screen->ComboF[ComboAt(Link->X-1,Link->Y+8)] == CF_PEGASUSITEM)
-						{
-							Screen->ComboF[ComboAt(Link->X-1,Link->Y+8)] = CF_NONE;
-							item BootGet = CreateItemAt(Screen->RoomData,ComboX(ComboAt(Link->X-1,Link->Y+8))-16,ComboY(ComboAt(Link->X-1,Link->Y+8)));
-							BootGet->Jump = 1;
-							BootGet->Pickup = IP_ST_SPECIALITEM + IP_HOLDUP;
-							Game->PlaySound(SFX_PEGAITEM);
-						}
-					}
+			if (Link->Dir == DIR_LEFT)
+			{
+				if (Screen->ComboF[ComboAt(Link->X-1,Link->Y+8)] == CF_PEGASUSITEM)
+				{
+					Screen->ComboF[ComboAt(Link->X-1,Link->Y+8)] = CF_NONE;
+					item BootGet = CreateItemAt(Screen->RoomData,ComboX(ComboAt(Link->X-1,Link->Y+8))-16,ComboY(ComboAt(Link->X-1,Link->Y+8)));
+					BootGet->Jump = 1;
+					BootGet->Pickup = IP_ST_SPECIALITEM + IP_HOLDUP;
+					Game->PlaySound(SFX_PEGAITEM);
+				}
+			}
 
-					if (Link->Dir == DIR_RIGHT)
-					{
-						if (Screen->ComboF[ComboAt(Link->X+17,Link->Y+8)] == CF_PEGASUSITEM)
-						{
-							Screen->ComboF[ComboAt(Link->X+17,Link->Y+8)] = CF_NONE;
-							item BootGet = CreateItemAt(Screen->RoomData,ComboX(ComboAt(Link->X+17,Link->Y+8))+16,ComboY(ComboAt(Link->X+17,Link->Y+8)));
-							BootGet->Jump = 1;
-							BootGet->Pickup = IP_ST_SPECIALITEM + IP_HOLDUP;
-							Game->PlaySound(SFX_PEGAITEM);
-						}
-					}
-
+			if (Link->Dir == DIR_RIGHT)
+			{
+				if (Screen->ComboF[ComboAt(Link->X+17,Link->Y+8)] == CF_PEGASUSITEM)
+				{
+					Screen->ComboF[ComboAt(Link->X+17,Link->Y+8)] = CF_NONE;
+					item BootGet = CreateItemAt(Screen->RoomData,ComboX(ComboAt(Link->X+17,Link->Y+8))+16,ComboY(ComboAt(Link->X+17,Link->Y+8)));
+					BootGet->Jump = 1;
+					BootGet->Pickup = IP_ST_SPECIALITEM + IP_HOLDUP;
+					Game->PlaySound(SFX_PEGAITEM);
 				}
 			}
 		}
+	}
+}
 
 // ---------------- Pegasus boot functions (end; see "Item: Pegasus Boots" below)
 
@@ -661,32 +663,31 @@ bool DoDraw = true;			// Global-scope bool used to prevent drawing at inappropri
 
 // ---------------- Moosh's 4 Way Curse script from Brock Lesnar.qst (start)
 
-void SetInputDir(int Dir){
-	if(Link->Dir==DIR_UP)
-		Link->InputUp = true;
-	else if(Link->Dir==DIR_DOWN)
-		Link->InputDown = true;
-	else if(Link->Dir==DIR_LEFT)
-		Link->InputLeft = true;
-	else if(Link->Dir==DIR_RIGHT)
-		Link->InputRight = true;
+void SetInputDir(int Dir)
+{
+	if(Link->Dir==DIR_UP) Link->InputUp = true;
+	else if(Link->Dir==DIR_DOWN) Link->InputDown = true;
+	else if(Link->Dir==DIR_LEFT) Link->InputLeft = true;
+	else if(Link->Dir==DIR_RIGHT) Link->InputRight = true;
 }
 
 
-void FourWayCurse(int FWC){
+void FourWayCurse(int FWC)
+{
 	// Make sure to call FourWayCurse() as late as possible in the global script (but before WaitDraw(), so that it doesn't stop input checks from working.
 
 	bool u;
 	bool d;
 	bool l;
 	bool r;
-	if(!Link->Item[I_PROGRESSIVEGEAR]){
+	if(!Link->Item[I_PROGRESSIVEGEAR])
+	{
 
 		if (Link->InputLeft && Link->InputUp || Link->InputLeft && Link->InputDown || Link->InputRight && Link->InputUp || Link->InputRight && Link->InputDown)
 		{
 			if (Link->Action == LA_WALKING)
 			{
-				 Link->InputLeft = false;
+				Link->InputLeft = false;
 				Link->InputRight = false;
 			}
 		}
@@ -696,110 +697,127 @@ void FourWayCurse(int FWC){
 			d = Link->InputDown;
 			l = Link->InputLeft;
 			r = Link->InputRight;
-			if(Link->PressUp){
+			if(Link->PressUp)
+			{
 				FWC[0] = 0;
 			}
-			else if(Link->PressDown){
+			else if(Link->PressDown)
+			{
 				FWC[0] = 1;
 			}
-			else if(Link->PressLeft){
+			else if(Link->PressLeft)
+			{
 				FWC[0] = 2;
 			}
-			else if(Link->PressRight){
+			else if(Link->PressRight)
+			{
 				FWC[0] = 3;
 			}
 			int ButtonsPressed;
-			if(u)
-				ButtonsPressed++;
-			if(d)
-				ButtonsPressed++;
-			if(l)
-				ButtonsPressed++;
-			if(r)
-				ButtonsPressed++;
+			if(u) ButtonsPressed++;
+			if(d) ButtonsPressed++;
+			if(l) ButtonsPressed++;
+			if(r) ButtonsPressed++;
 			Link->InputUp = false;
 			Link->InputDown = false;
 			Link->InputLeft = false;
-				Link->InputRight = false;
-			if(ButtonsPressed>1){
+			Link->InputRight = false;
+			if(ButtonsPressed>1)
+			{
 				u = false;
-				if(FWC[0]==0)
-					u = true;
+				if(FWC[0]==0) u = true;
 				d = false;
-				if(FWC[0]==1)
-					d = true;
+				if(FWC[0]==1) d = true;
 				l = false;
-				if(FWC[0]==2)
-					l = true;
+				if(FWC[0]==2) l = true;
 				r = false;
-				if(FWC[0]==3)
-				r = true;
+				if(FWC[0]==3) r = true;
 				Link->InputUp = false;
 				Link->InputDown = false;
 				Link->InputLeft = false;
 				Link->InputRight = false;
 			}
-			if(u){
-				if(Link->X%8==0){
+			if(u)
+			{
+				if(Link->X%8==0)
+				{
 					Link->InputUp = true;
 				}
-				else if(Link->X%8==1||Link->X%8==7){
+				else if(Link->X%8==1||Link->X%8==7)
+				{
 					Link->X = Round((Link->X)/8)*8;
 					Link->InputUp = true;
 				}
-				else if(Link->Dir==DIR_DOWN){
+				else if(Link->Dir==DIR_DOWN)
+				{
 					Link->X = Round((Link->X)/8)*8;
 					Link->InputUp = true;
 				}
-				else{
+				else
+				{
 					SetInputDir(Link->Dir);
 				}
 			}
-			else if(d){
-				if(Link->X%8==0){
+			else if(d)
+			{
+				if(Link->X%8==0)
+				{
 					Link->InputDown = true;
 				}
-				else if(Link->X%8==1||Link->X%8==7){
+				else if(Link->X%8==1||Link->X%8==7)
+				{
 					Link->X = Round((Link->X)/8)*8;
 					Link->InputDown = true;
 				}
-				else if(Link->Dir==DIR_UP){
+				else if(Link->Dir==DIR_UP)
+				{
 					Link->X = Round((Link->X)/8)*8;
 					Link->InputDown = true;
 				}
-				else{
+				else
+				{
 					SetInputDir(Link->Dir);
 				}
 			}
-			else if(l){
-				if(Link->Y%8==0){
+			else if(l)
+			{
+				if(Link->Y%8==0)
+				{
 					Link->InputLeft = true;
 				}
-				else if(Link->Y%8==1||Link->Y%8==7){
+				else if(Link->Y%8==1||Link->Y%8==7)
+				{
 					Link->Y = Round((Link->Y)/8)*8;
 					Link->InputLeft = true;
 				}
-				else if(Link->Dir==DIR_RIGHT){
+				else if(Link->Dir==DIR_RIGHT)
+				{
 					Link->Y = Round((Link->Y)/8)*8;
 					Link->InputLeft = true;
 				}
-				else{
+				else
+				{
 					SetInputDir(Link->Dir);
 				}
 			}
-			else if(r){
-				if(Link->Y%8==0){
+			else if(r)
+			{
+				if(Link->Y%8==0)
+				{
 					Link->InputRight = true;
 				}
-				else if(Link->Y%8==1||Link->Y%8==7){
+				else if(Link->Y%8==1||Link->Y%8==7)
+				{
 					Link->Y = Round((Link->Y)/8)*8;
 					Link->InputRight = true;
 				}
-				else if(Link->Dir==DIR_LEFT){
+				else if(Link->Dir==DIR_LEFT)
+				{
 					Link->Y = Round((Link->Y)/8)*8;
 					Link->InputRight = true;
 				}
-				else{
+				else
+				{
 					SetInputDir(Link->Dir);
 				}
 			}
@@ -910,6 +928,10 @@ global script Plan6Global{
 
 
 
+
+
+
+// --------------------------------------- Chapter 1: int, bool, lweapon, eweapon, npc, item declarations
 
 		int WindyTimer;		// Timer for windy screens.
 
